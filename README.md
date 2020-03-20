@@ -39,4 +39,7 @@ saarama --topology /path/to/topology --xtc /path/to/trajectory [COMMAND]
 
 ## Example
 
-Example files are provided in the example_files folder and can be used to check if the tool is working.
+Example files are provided in the example_files folder and can be used to check if the tool is working. The resulting plot
+should look like this:
+
+![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_plot.png)
