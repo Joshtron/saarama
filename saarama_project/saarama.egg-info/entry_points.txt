@@ -1,0 +1,3 @@
+[console_scripts]
+saarama = saarama.cli:start
+

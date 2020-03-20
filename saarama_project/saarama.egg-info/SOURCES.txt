@@ -1,0 +1,10 @@
+setup.py
+saarama/__init__.py
+saarama/cli.py
+saarama/functions.py
+saarama.egg-info/PKG-INFO
+saarama.egg-info/SOURCES.txt
+saarama.egg-info/dependency_links.txt
+saarama.egg-info/entry_points.txt
+saarama.egg-info/requires.txt
+saarama.egg-info/top_level.txt
