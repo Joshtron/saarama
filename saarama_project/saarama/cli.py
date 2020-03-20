@@ -19,10 +19,13 @@ def main(ctx, topology: str, xtc: str):
 @click.pass_context
 def plot(ctx):
     plt.scatter(ctx.obj['psi'], ctx.obj['phi'], s=15)
+    plt.plot([0, 0], [-180, 180], c='k', alpha=0.3)
+    plt.plot([-180, 180], [0, 0], c='k', alpha=0.3)
     plt.xlim(-180, 180)
     plt.ylim(-180, 180)
     plt.xlabel('φ')
     plt.ylabel('ψ')
+    plt.title('Ramachandran plot of a single amino acid')
     plt.show()
 
 @main.command()
