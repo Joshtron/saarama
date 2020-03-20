@@ -10,6 +10,12 @@ if needed. Instead of calculating torsion angles around peptide bonds the tool u
 
 ## Installation
 
+First you need to clone the repository:
+
+```
+git clone https://github.com/Joshtron/saarama
+```
+
 Please make sure to install MDAnalysis. pip and conda commands are listed below:
 
 ```
