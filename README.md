@@ -30,7 +30,7 @@ After successful MDAnalysis installation, call the setup.py script which will en
 tool. It will take care of dependencies such us matplotlib, click and MDAnalysis.
 
 ```
-python /path/to/setup.py develop
+python /path/to/saarama_project/setup.py develop
 ```
 
 ## Command line tool
