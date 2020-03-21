@@ -2,8 +2,8 @@
 
 SAARAMA helps you with calculating and plotting of φ (Phi) and ψ (Psi) angles in single amino acid simulations. So far SAARAMA 
 only accepts GROMACS .gro topology files and .xtc trajectories but I'm happy to expend it to different trajectory file types
-if needed. Instead of calculating torsion angles around peptide bonds the tool uses an approximation by using the H-Atom for
-φ and the O-Atom for ψ. 
+if needed. Instead of calculating torsion angles around peptide bonds the tool uses an approximation by using the H-atom for
+φ and the O-atom for ψ. 
 
 * φ: H1-N-CA-C
 * ψ: N-CA-C-OT1
