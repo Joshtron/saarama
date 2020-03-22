@@ -45,7 +45,10 @@ saarama --topology /path/to/topology --xtc /path/to/trajectory [COMMAND]
 
 ## Example
 
-Example files are provided in the example_files folder and can be used to check if the tool is working. The resulting plot
-should look like this:
+Example files are provided in the example_files folder and can be used to check if the tool is working. The resulting plot coming from the Alanine data should look like the image below. It is visible that there's less range of motion around ψ because the O-atom has a double bound character and is therefore more stiff. The H-atom has a lot of space to wiggle around which explains φ range of motion.
 
-![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_plot.png)
+![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/alanine.png)
+
+Proline on the other hand looks different than other amino acids. The nitrogen is bound in a ring which results in a constrained φ angle. This is the reason Proline is usually excluded from standard Ramachandran plots. 
+
+![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/proline.png)
