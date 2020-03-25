@@ -14,7 +14,7 @@ plt.style.use('seaborn-darkgrid')
 @click.pass_context
 def main(ctx, topology: str, xtc: str):
     u = mda.Universe(topology, xtc)
-    psi, phi = prepare_dihedrals(topology, u)
+    phi, psi = prepare_dihedrals(topology, u)
     ctx.obj['psi'] = psi
     ctx.obj['phi'] = phi
 
@@ -26,7 +26,7 @@ def plot(ctx):
     gs = gridspec.GridSpec(2, 2, figure=fig)
     ax1 = fig.add_subplot(gs[0, :])
 
-    ax1.scatter(ctx.obj['psi'], ctx.obj['phi'], s=15, color='dimgray')
+    ax1.scatter(ctx.obj['phi'], ctx.obj['psi'], s=15, color='dimgray')
     ax1.plot([0, 0], [-180, 180], c='k', alpha=0.3)
     ax1.plot([-180, 180], [0, 0], c='k', alpha=0.3)
     ax1.set_xlim(-180, 180)
