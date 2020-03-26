@@ -37,7 +37,8 @@ python /path/to/saarama_project/setup.py develop
 
 Like mentioned above, SAARAMA uses a topology and a trajectory file to calculate the torsion angles over the different time 
 frames. It can either print the angles to stdout [terminal] or plot the angles in a Ramachandran plot fashion [plot] with 
-the help of Matplotlib. Commands should look like this:
+the help of Matplotlib. It takes 'naked' as well as N-terminal acetyl capped amino acids (ACE-X-NME). The script will automatically detect if the first residue is a acetyl residue and will treat it accordingly.
+Commands should look like this:
 
 ```
 saarama --topology /path/to/topology --xtc /path/to/trajectory [COMMAND]
