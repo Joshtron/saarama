@@ -1,4 +1,3 @@
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
 
 def calc_q_vectors(p1, p2, p3, p4):
@@ -144,5 +143,19 @@ def get_psi_phi(atoms, u):
         psi_temp = [sub[0], sub[2], sub[3], sub[4]]
         phi.append(phi_temp)
         psi.append(psi_temp)
+
+    return phi, psi
+
+def angle_to_list(u):
+    from MDAnalysis.analysis.dihedrals import Ramachandran
+    r = u.select_atoms("resid 2")
+    R = Ramachandran(r).run()
+
+    phi = []
+    psi = []
+
+    for line in list(R.angles):
+        phi.append(line.tolist()[0][0])
+        psi.append(line.tolist()[0][1])#
 
     return phi, psi
