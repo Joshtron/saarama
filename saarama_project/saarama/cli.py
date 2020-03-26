@@ -12,7 +12,6 @@ plt.style.use('seaborn-darkgrid')
 @click.pass_context
 def main(ctx, topology: str, xtc: str):
     u = mda.Universe(topology, xtc)
-    print(u)
     if 'ACE' in str(u.residues[0]):
         phi, psi = angle_to_list(u)
         ctx.obj['psi'] = psi
