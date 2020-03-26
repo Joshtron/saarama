@@ -1,9 +1,7 @@
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from .functions import calc_q_vectors, calc_cross_vectors, \
-    calc_normals, calc_orthogonal_unit_vectors, calc_dihedral_angle, \
-    get_dihedrals, prepare_dihedrals
+from .functions import prepare_dihedrals, angle_to_list
 import click
 
 plt.style.use('seaborn-darkgrid')
@@ -14,9 +12,16 @@ plt.style.use('seaborn-darkgrid')
 @click.pass_context
 def main(ctx, topology: str, xtc: str):
     u = mda.Universe(topology, xtc)
-    phi, psi = prepare_dihedrals(topology, u)
-    ctx.obj['psi'] = psi
-    ctx.obj['phi'] = phi
+    print(u)
+    if 'ACE' in str(u.residues[0]):
+        phi, psi = angle_to_list(u)
+        ctx.obj['psi'] = psi
+        ctx.obj['phi'] = phi
+    else:
+        phi, psi = prepare_dihedrals(topology, u)
+        ctx.obj['psi'] = psi
+        ctx.obj['phi'] = phi
+
 
 @main.command()
 @click.pass_context
