@@ -156,6 +156,25 @@ def angle_to_list(u):
 
     for line in list(R.angles):
         phi.append(line.tolist()[0][0])
-        psi.append(line.tolist()[0][1])#
+        psi.append(line.tolist()[0][1])
 
     return phi, psi
+
+def angle_trans(angle_list):
+    new_angle_list = []
+
+    for angle in angle_list:
+        if angle < 0:
+            new_angle_list.append(abs(angle) + ((180 - abs(angle)) * 2))
+        else:
+            new_angle_list.append(angle)
+
+    return new_angle_list
+
+def angle_diff(angle_list):
+    new_angle_list = []
+
+    for i in range(1, len(angle_list)):
+        new_angle_list.append(angle_list[i] - angle_list[i - 1])
+
+    return (new_angle_list)
