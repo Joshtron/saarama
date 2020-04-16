@@ -1,0 +1,50 @@
+ATOM      1  C   ACE     1       1.048   0.238  -0.245  1.00  0.00           C  
+ATOM      2  O   ACE     1       1.659  -0.755  -0.662  1.00  0.00           O  
+ATOM      0  CH3 ACE     1      -0.410   0.146   0.154  1.00  0.00           C  
+ATOM      3 1HH3 ACE     1      -0.529  -0.569   0.955  1.00  0.00           H  
+ATOM      4 2HH3 ACE     1      -0.762   1.110   0.490  1.00  0.00           H  
+ATOM      5 3HH3 ACE     1      -1.005  -0.170  -0.690  1.00  0.00           H  
+ATOM      6  N   PRO     2       1.662   1.368  -0.150  1.00  0.00           N  
+ATOM      7  CA  PRO     2       3.062   1.531  -0.515  1.00  0.00           C  
+ATOM      8  C   PRO     2       3.994   0.826   0.485  1.00  0.00           C  
+ATOM      9  O   PRO     2       3.810   0.941   1.697  1.00  0.00           O  
+ATOM     10  CB  PRO     2       3.215   3.060  -0.504  1.00  0.00           C  
+ATOM     11  CG  PRO     2       2.193   3.519   0.546  1.00  0.00           C  
+ATOM     12  CD  PRO     2       1.013   2.569   0.329  1.00  0.00           C  
+ATOM     13  HA  PRO     2       3.247   1.127  -1.513  1.00  0.00           H  
+ATOM     14 2HB  PRO     2       2.928   3.452  -1.482  1.00  0.00           H  
+ATOM     15 3HB  PRO     2       4.233   3.383  -0.275  1.00  0.00           H  
+ATOM     16 2HG  PRO     2       1.907   4.566   0.423  1.00  0.00           H  
+ATOM     17 3HG  PRO     2       2.602   3.368   1.547  1.00  0.00           H  
+ATOM     18 2HD  PRO     2       0.339   2.951  -0.442  1.00  0.00           H  
+ATOM     19 3HD  PRO     2       0.461   2.377   1.252  1.00  0.00           H  
+TER   
+ATOM     20  N   NME     3       4.975   0.110   0.051  1.00  0.00           N  
+ATOM     21  CH3 NME     3       5.858  -0.558   0.991  1.00  0.00           C  
+ATOM     22  H   NME     3       5.129   0.014  -0.943  1.00  0.00           H  
+ATOM     23 1HH3 NME     3       6.614   0.129   1.340  1.00  0.00           H  
+ATOM     24 2HH3 NME     3       5.293  -0.917   1.839  1.00  0.00           H  
+ATOM     25 3HH3 NME     3       6.342  -1.397   0.512  1.00  0.00           H  
+CONECT    1    2    2    6
+CONECT    2    1    1
+CONECT    6    1    7   12
+CONECT    7    6    8   10   13
+CONECT    8    7    9    9   20
+CONECT    9    8    8
+CONECT   10    7   11   14   15
+CONECT   11   10   12   16   17
+CONECT   12    6   11   18   19
+CONECT   13    7
+CONECT   14   10
+CONECT   15   10
+CONECT   16   11
+CONECT   17   11
+CONECT   18   12
+CONECT   19   12
+CONECT   20    8   21   22
+CONECT   21   20   23   24   25
+CONECT   22   20
+CONECT   23   21
+CONECT   24   21
+CONECT   25   21
+END
