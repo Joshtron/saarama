@@ -7,9 +7,11 @@ from .functions import prepare_dihedrals, angle_to_list, angle_trans, angle_diff
 import click
 import seaborn as sns
 import statistics
+import numpy as np
+import scipy.stats as st
+import matplotlib.animation as anim
 
 #Make it a little more artsy
-
 plt.style.use('seaborn-darkgrid')
 
 #Set up the command line options
@@ -45,6 +47,7 @@ def plot(ctx):
 
     fig = plt.figure(constrained_layout=True)
     gs = gridspec.GridSpec(3, 2, figure=fig)
+    fig.suptitle('Number of angles: ' + str(len(ctx.obj['psi'])), fontsize=12)
 
     #Scatter plot
 
@@ -124,21 +127,82 @@ def plot(ctx):
     ax4.set_xlim(0, len(ctx.obj['phi']))
     plt.legend(loc='upper right', borderaxespad=0.)
 
+    #3D Density plot
+
+    #bins_list_phi = list(range(int(min(psi_trans)), int(max(psi_trans)), 1))
+    #bins_list_psi = list(range(int(min(phi_trans)), int(max(phi_trans)), 1))
     bins_list_phi = list(range(int(min(ctx.obj['phi'])), int(max(ctx.obj['phi'])), 1))
     bins_list_psi = list(range(int(min(ctx.obj['psi'])), int(max(ctx.obj['psi'])), 1))
 
+
+    ax5 = fig.add_subplot(gs[2,0], projection='3d')
+
+    x = np.asarray(ctx.obj['phi'])
+    y = np.asarray(ctx.obj['psi'])
+
+    x = np.asarray(ctx.obj['phi'])
+    y = np.asarray(ctx.obj['psi'])
+
+    deltaX = (max(x) - min(x)) / 10
+    deltaY = (max(y) - min(y)) / 10
+
+    xmin = min(x) - deltaX
+    xmax = max(x) + deltaX
+    ymin = min(y) - deltaY
+    ymax = max(y) + deltaY
+
+
+    xx, yy = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+
+    positions = np.vstack([xx.ravel(), yy.ravel()])
+    values = np.vstack([x, y])
+    kernel = st.gaussian_kde(values)
+    f = np.reshape(kernel(positions).T, xx.shape)
+
+    #ax5.plot_wireframe(xx, yy, f, alpha=0.8)
+    ax5.plot_surface(xx, yy, f, rstride=1, cstride=1, edgecolor='none', cmap='plasma')
+    ax5.set_xlim(-180, 180)
+    ax5.set_ylim(-180, 180)
+    ax5.set_xlabel('φ')
+    ax5.set_ylabel('ψ')
+    ax5.set_zlabel('Density')
+    ax5.set_title('Surface plot of angle distributions')
+    ax5.view_init(20, 280)
+
     #Histogram/Density plot for angle distribution
 
-    ax5 = fig.add_subplot(gs[2,0:])
-    #sns.kdeplot(phi_trans, ax=ax5, color = 'indianred', label='φ')
-    #sns.kdeplot(psi_trans, ax=ax5, color = 'darkkhaki', label='ψ')
+    ax6 = fig.add_subplot(gs[2,1])
+    #sns.distplot(phi_trans, ax=ax5, bins=bins_list_phi, color = 'indianred', label='φ')
+    #sns.distplot(psi_trans, ax=ax5, bins=bins_list_psi, color = 'darkkhaki', label='ψ')
+    #ax5.set_xlim(0,360)
     #ax5.hist(ctx.obj['phi'], bins=bins_list_phi, alpha=0.75, color = 'indianred', label='φ')
     #ax5.hist(ctx.obj['psi'], bins=bins_list_psi, alpha=0.75, color = 'darkkhaki', label='ψ')
-    sns.distplot(ctx.obj['phi'], ax=ax5, bins=bins_list_phi, color = 'indianred', label='φ')
-    sns.distplot(ctx.obj['psi'], ax=ax5, bins=bins_list_psi, color = 'darkkhaki', label='ψ')
-    ax5.set_xlim(-180, 180)
-    ax5.set_title('Histogram/Density plot of angle distribution')
+    sns.distplot(ctx.obj['phi'], ax=ax6, bins=bins_list_phi, color = 'indianred', label='φ')
+    sns.distplot(ctx.obj['psi'], ax=ax6, bins=bins_list_psi, color = 'darkkhaki', label='ψ')
+    ax6.set_xlim(-180, 180)
+    ax6.set_title('Histogram/Density plot of angle distribution')
     plt.legend()
+
+    '''
+    #Polar plots that are not included yet
+    
+    ax6 = fig.add_subplot(gs[3, 0], projection='polar')
+    bin_size = 20
+    a, b = np.histogram(phi_trans, bins=np.arange(0, 360 + bin_size, bin_size))
+    centers = np.deg2rad(np.ediff1d(b) // 2 + b[:-1])
+    ax6.bar(centers, a, width=np.deg2rad(bin_size), bottom=0.0, color='.8', edgecolor='k')
+    ax6.set_theta_zero_location("N")
+    ax6.set_theta_direction(-1)
+
+    ax7 = fig.add_subplot(gs[3, 1], projection='polar')
+    bin_size = 20
+    a, b = np.histogram(psi_trans, bins=np.arange(0, 360 + bin_size, bin_size))
+    centers = np.deg2rad(np.ediff1d(b) // 2 + b[:-1])
+    ax7.bar(centers, a, width=np.deg2rad(bin_size), bottom=0.0, color='.8', edgecolor='k')
+    ax7.set_theta_zero_location("N")
+    ax7.set_theta_direction(-1)
+    '''
+
 
     plt.show()
 
@@ -150,10 +214,46 @@ def terminal(ctx):
     print(ctx.obj['psi'])
     print(ctx.obj['phi'])
 
+@main.command()
+@click.pass_context
+def animate(ctx):
+
+    phi = ctx.obj['phi']
+    psi = ctx.obj['psi']
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_xlim(-180, 180)
+    ax.set_ylim(-180, 180)
+
+    plt.scatter(phi[0], psi[0], color='k', s=50)
+
+    frames = len(ctx.obj['phi'])
+
+
+
+    def animate(i):
+        step = int(frames*0.01)
+        i = int(i*step)
+        j = int(i+step)
+        print(i, j)
+        x = phi[i:j]
+        y = psi[i:j]
+        ax.scatter(x, y, color='k', s=15)
+
+    a = anim.FuncAnimation(fig, animate, frames=frames, interval=1, repeat=True, blit=False)
+    plt.scatter(phi[0], psi[0], color='k', s=15)
+    ax.plot([0, 0], [-180, 180], c='k', alpha=0.2)
+    ax.plot([-180, 180], [0, 0], c='k', alpha=0.2)
+    plt.xlim(-180, 180)
+    plt.ylim(-180, 180)
+    plt.ylabel('ψ')
+    plt.xlabel('φ')
+    plt.show()
+
 def start():
     main(obj={})
 
 
 if __name__ == '__main__':
     start()
-
