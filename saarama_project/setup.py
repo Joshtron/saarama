@@ -9,7 +9,7 @@ setup(
       author_email='joshua.bopp@stud-mail.uni-wuerzburg.de',
       packages=['saarama'],
       package_data={},
-      install_requires=['matplotlib', 'MDAnalysis', 'click', 'Biopython', 'seaborn', 'scipy', 'math'],
+      install_requires=['matplotlib', 'MDAnalysis', 'click', 'Biopython', 'seaborn', 'scipy'],
       entry_points={
         'console_scripts': ['saarama = saarama.cli:start']
       }
