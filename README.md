@@ -68,7 +68,7 @@ saarama --top proline.pdb --trj proline.dcd plot
 
 ![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/proline_capped.png)
 
-If one is interested how angles of every residue in a polypeptide change over time, the [multi-animate] command can be used. A randomly composed protein was built in Pymol and simulated in openMM. The '--ma' set needs to be set. The range of residues can be set with the '--start' and '--end' option. Their default values are 2 which will animate only the first residue after the ACE residue. 
+If one is interested how angles of every residue in a polypeptide change over time, the [multi-animate] command can be used. A randomly composed protein was built in Pymol and simulated in openMM. The '--ma' flag needs to be set. The range of residues can be set with the '--start' and '--end' option. Their default values are 2 which will animate only the first residue after the ACE residue. 
 
 ```
 saarama --top random_capped.pdb --trj random_capped.dcd --ma --start 2 --end 8 multi-animate
