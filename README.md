@@ -53,13 +53,25 @@ saarama --top 5r26.pdb plot
 
 The resulting plot coming from the Alanine data should look like the image below. On the upper left side a simple scatter plot is provided with φ-angle on the x-axis and ψ-angle on the y-axis. On the upper right side a contour plot with rug plots on the x and y-axis gives more detail about angle densities. The middle plots show how angles changed over time even though this is not the most sophisticated way of doing this. Angles can have values from 0 to 180/-180 and then back to 0. As this would make visualization difficult the angles are normalized to reach from 0° to 360° which allows to calculate the difference to the previous angle that then gets plotted. The incorparated line plot should be enjoyed with caution as it is unclear in which direction the angles changed. Is it likely that the angle travels the respective shorter route but one can not be entirely sure. I'm currently thinking about a good way of fixing this. The bottome left plot is a 3D density plot which shows the same information as the contour plot but in 3D which can help to get a better overview of angle space. The bottom right plot is a mixture between histogram and density plot and shows the overall distribution of the normalized angles.
 
+```
+saarama --top alanine.pdb --trj alanine.dcd plot
+```
 
 ![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/alanine_capped.png)
 
 
 Proline looks different than other amino acids. The nitrogen is bound in a ring which results in a constrained φ angle. This is the reason Proline is usually excluded from standard Ramachandran plots.
 
+```
+saarama --top proline.pdb --trj proline.dcd plot
+```
 
 ![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/proline_capped.png)
 
+If one is interested how angles of every residue in a polypeptide change over time, the [multi-animate] command can be used. A randomly composed protein was built in Pymol and simulated in openMM. The '--ma' set needs to be set. The range of residues can be set with the '--start' and '--end' option. Their default values are 2 which will animate only the first residue after the ACE residue. 
+
+```
+saarama --top random_capped.pdb --trj random_capped.dcd --ma --start 2 --end 8 multi-animate
+```
+![](https://github.com/Joshtron/saarama/blob/master/saarama_project/example_files/test.gif)
 
