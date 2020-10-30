@@ -1,3 +1,109 @@
+def prepare_capped_dihedrals(path, u, res, id):
+
+    #This is the core of torsion angle calculation where everything comes together-
+    #atoms is a list that contains all lines of the original topology file.
+
+    atoms = []
+
+    with open(path) as file:
+        for line in list(file):
+            if not len(line.split()) == 0:
+                if line.split()[0] == 'ATOM':
+                    atoms.append(line)
+
+    #This function gets the positions of needed atoms and their coordinates from the trajectory file
+    #and returns them as well as the residue names. Well, res name is not yet included but will follow
+
+    phi, psi = get_psi_phi(atoms, u, res, id)
+
+    phi_list = []
+    psi_list = []
+    i = 0
+    angle_list = [phi ,psi]
+
+    #This actually calculates the torsion angles with help of the coordinates.
+
+    for angle in angle_list:
+        for sublist in angle:
+            p1 = sublist[0]
+            p2 = sublist[1]
+            p3 = sublist[2]
+            p4 = sublist[3]
+            finale_angle = get_dihedrals(p1, p2, p3, p4)
+            if i == 0:
+                phi_list.append(finale_angle)
+            else:
+                psi_list.append(finale_angle)
+        i += 1
+
+    return phi_list, psi_list
+
+def get_psi_phi(atoms, u, res, id):
+
+    atom_list = []
+    entry_number = []
+    i = 0
+
+    #This atrocity is actually quite useful and helps you by looping through all atoms
+    #that are going to be plotted. Basically this extracts all positions that are needed in order
+    #to calculate torsion angles. Those positions of important atoms gets saved in atom_list and entry_number
+    #so they can get looked up in the trajectory file to extract the coordinates.
+
+
+    for atom in atoms:
+        current_atom = atom.split(' ')
+        fca = list(filter(lambda x: x != "", current_atom))
+        if 'ATOM' == fca[0]:
+            if len(fca) == 12 and int(fca[id]) == int(res)-1:
+                if fca[2] == 'C':
+                    atom_list.append(list(map(float, fca[5:8])))
+                    entry_number.append(i)
+            if len(fca) == 12 and int(fca[id]) == int(res):
+                if fca[2] == 'N' or fca[2] == 'CA' or fca[2] == 'C':
+                    atom_list.append(list(map(float, fca[5:8])))
+                    entry_number.append(i)
+            if len(fca) == 12 and int(fca[id]) == int(res)+1:
+                if fca[2] == 'N':
+                    atom_list.append(list(map(float, fca[5:8])))
+                    entry_number.append(i)
+            i += 1
+
+    dihedral_list = []
+
+    #Coordinates get extracted here
+
+    for ts in u.trajectory:
+        pos = ts.positions
+        temp_list = []
+        for index in entry_number:
+            temp_list.append(pos[index].tolist())
+        dihedral_list.append(temp_list)
+
+    phi = []
+    psi = []
+
+    #We get the coordinates from 5 atoms where atom 1-4 forms the phi angles and atom 2-5 froms the
+    #psi angle. coordinates get splitted here.
+
+    for sub in dihedral_list:
+        phi_temp = [sub[0], sub[1], sub[2], sub[3]]
+        psi_temp = [sub[1], sub[2], sub[3], sub[4]]
+        phi.append(phi_temp)
+        psi.append(psi_temp)
+
+    return phi, psi
+
+#Not really elegant but this calculates torsion angles the old fashioned way and it is somehow guranteed that it works
+#Trust me, I tested this a lot and validated most of my angles with vmd.
+
+def get_dihedrals(a, b, c, d):
+    q1, q2, q3 = calc_q_vectors(a, b, c, d)
+    q1_x_q2, q2_x_q3 = calc_cross_vectors(q1, q2, q3)
+    n1, n2 = calc_normals(q1_x_q2, q2_x_q3)
+    u1, u2, u3 = calc_orthogonal_unit_vectors(n2, q2)
+    final_angle = calc_dihedral_angle(n1, u1, u2, u3)
+    return final_angle
+
 def calc_q_vectors(p1, p2, p3, p4):
     """Function to calculate q vectors"""
     import numpy as np
@@ -47,91 +153,8 @@ def calc_dihedral_angle(n1,u1,u2,u3):
     final_angle = float("%8.3f"%theta_deg)
     return final_angle
 
-def get_dihedrals(a, b, c, d):
-    q1, q2, q3 = calc_q_vectors(a, b, c, d)
-    q1_x_q2, q2_x_q3 = calc_cross_vectors(q1, q2, q3)
-    n1, n2 = calc_normals(q1_x_q2, q2_x_q3)
-    u1, u2, u3 = calc_orthogonal_unit_vectors(n2, q2)
-    final_angle = calc_dihedral_angle(n1, u1, u2, u3)
-    return final_angle
-
-def get_psi_phi(atoms, u, res, id):
-
-    atom_list = []
-    entry_number = []
-    i = 0
-
-    for atom in atoms:
-        current_atom = atom.split(' ')
-        fca = list(filter(lambda x: x != "", current_atom))
-        if 'ATOM' == fca[0]:
-            if len(fca) == 12 and int(fca[id]) == int(res)-1:
-                if fca[2] == 'C':
-                    atom_list.append(list(map(float, fca[5:8])))
-                    entry_number.append(i)
-            if len(fca) == 12 and int(fca[id]) == int(res):
-                if fca[2] == 'N' or fca[2] == 'CA' or fca[2] == 'C':
-                    atom_list.append(list(map(float, fca[5:8])))
-                    entry_number.append(i)
-            if len(fca) == 12 and int(fca[id]) == int(res)+1:
-                if fca[2] == 'N':
-                    atom_list.append(list(map(float, fca[5:8])))
-                    entry_number.append(i)
-            i += 1
-
-    dihedral_list = []
 
 
 
-    for ts in u.trajectory:
-        pos = ts.positions
-        temp_list = []
-        for index in entry_number:
-            temp_list.append(pos[index].tolist())
-        dihedral_list.append(temp_list)
-
-    phi = []
-    psi = []
-
-    for sub in dihedral_list:
-        phi_temp = [sub[0], sub[1], sub[2], sub[3]]
-        psi_temp = [sub[1], sub[2], sub[3], sub[4]]
-        phi.append(phi_temp)
-        psi.append(psi_temp)
-
-    return phi, psi
-
-
-def prepare_capped_dihedrals(path, u, res, id):
-
-    atoms = []
-
-    with open(path) as file:
-        for line in list(file):
-            if not len(line.split()) == 0:
-                if line.split()[0] == 'ATOM':
-                    atoms.append(line)
-
-    phi, psi = get_psi_phi(atoms, u, res, id)
-
-    phi_list = []
-    psi_list = []
-    i = 0
-    angle_list = [phi ,psi]
-
-    for angle in angle_list:
-        for sublist in angle:
-            p1 = sublist[0]
-            p2 = sublist[1]
-            p3 = sublist[2]
-            p4 = sublist[3]
-            finale_angle = get_dihedrals(p1, p2, p3, p4)
-            if i == 0:
-                phi_list.append(finale_angle)
-            else:
-                psi_list.append(finale_angle)
-        i += 1
-
-    return phi_list, psi_list
 
 
