@@ -9,6 +9,7 @@ import matplotlib.gridspec as gridspec
 from .functions_single import prepare_dihedrals, angle_to_list, angle_trans, angle_diff
 from .functions_capped import prepare_capped_dihedrals
 from .functions_just_top import prepare_top_dihedrals
+from .functions_multi import prepare_all_dihedrals
 import click
 import seaborn as sns
 import statistics
@@ -25,7 +26,10 @@ import matplotlib.animation as anim
 @click.option('--top', help='path to topology.gro or topology.pdb')
 @click.option('--trj', help='path to trajectories.xtc or trajectories.dcd', default='')
 @click.option('--res', help='residue number (default = 2)', default=2)
-@click.option('--id', help='index of residue number in .pdb file (zero-based, default = 4)', default=4)
+@click.option('--id', help='index of residue number in .pdb file (default = 4)', default=4)
+@click.option('--ma', help='animates all residues in a protein', is_flag=True)
+@click.option('--start', help='Only works when --ma flag is set, gives the number of the first residues that should be animated (default = 2)', type=int, required=False, default=2)
+@click.option('--end', help='Only works when --ma flag is set, gives the number of the last residues that should be animated (default = 2)', type=int, required=False, default=2)
 @click.pass_context
 
 #Calculates the angles from the input topology and trajectories and store it in ctx.obj
@@ -35,7 +39,7 @@ import matplotlib.animation as anim
 
 
 
-def main(ctx, top: str, trj: str, res: str, id:str):
+def main(ctx, top: str, trj: str, res: str, id:str, ma:bool, start:int, end:int):
     if trj == '':
         ctx.obj['trj'] = 'empty'
         phi_gen, psi_gen, phi_pro, psi_pro, phi_gly, psi_gly, phi_pre, psi_pre = prepare_top_dihedrals(top)
@@ -50,7 +54,15 @@ def main(ctx, top: str, trj: str, res: str, id:str):
     else:
         ctx.obj['trj'] = 'filled'
         u = mda.Universe(top, trj)
-        if 'ACE' in str(u.residues[0]):
+        if ma == True:
+            if end < start:
+                print('Wait a minute, that is not possible!')
+            else:
+                phi, psi, res_name_list = prepare_all_dihedrals(top, u, res, id, start, end+1)
+                ctx.obj['psi'] = psi
+                ctx.obj['phi'] = phi
+                ctx.obj['res'] = res_name_list
+        elif 'ACE' in str(u.residues[0]):
             phi, psi = prepare_capped_dihedrals(top, u, res, id)
             ctx.obj['psi'] = psi
             ctx.obj['phi'] = phi
@@ -224,9 +236,6 @@ def plot(ctx):
         x = np.asarray(ctx.obj['phi'])
         y = np.asarray(ctx.obj['psi'])
 
-        x = np.asarray(ctx.obj['phi'])
-        y = np.asarray(ctx.obj['psi'])
-
         deltaX = (max(x) - min(x)) / 10
         deltaY = (max(y) - min(y)) / 10
 
@@ -339,11 +348,7 @@ def animate(ctx):
     ax.set_xlim(-180, 180)
     ax.set_ylim(-180, 180)
 
-    plt.scatter(phi[0], psi[0], color='k', s=50)
-
     frames = len(phi)
-
-
 
     def animate(i):
         step = int(frames*0.01)
@@ -354,13 +359,71 @@ def animate(ctx):
         ax.scatter(x, y, color='k', s=15)
 
     a = anim.FuncAnimation(fig, animate, frames=frames, interval=1, repeat=True, blit=False)
-    plt.scatter(phi[0], psi[0], color='k', s=15)
     ax.plot([0, 0], [-180, 180], c='k', alpha=0.2)
     ax.plot([-180, 180], [0, 0], c='k', alpha=0.2)
     plt.xlim(-180, 180)
     plt.ylim(-180, 180)
     plt.ylabel('ψ')
     plt.xlabel('φ')
+    plt.show()
+
+@main.command()
+@click.pass_context
+def multi_animate(ctx):
+
+    phi = []
+    psi = []
+
+    phi = ctx.obj['phi']
+    psi = ctx.obj['psi']
+    res_name_list = ctx.obj['res']
+
+    fig = plt.figure()
+
+    columns = 0
+    rows = 0
+
+    if len(phi) < 4:
+        rows = len(phi)
+    else:
+        rows = 4
+
+
+    if len(phi) <= 4:
+        columns = 1
+    elif (len(phi) / 4) > 1:
+        columns = int((len(phi) / 4))+1
+
+    gs = gridspec.GridSpec(columns, rows)
+    plot_names = ["ax" + str(i) for i in range(1, len(phi)+1)]
+    axs = []
+
+    i = 0
+
+    for c, num in zip(plot_names, range(1, len(phi)+1)):
+        axs.append(fig.add_subplot(gs[num - 1]))
+        axs[-1].set_xlim(-180, 180)
+        axs[-1].set_ylim(-180, 180)
+        axs[-1].plot([0, 0], [-180, 180], c='k', alpha=0.2)
+        axs[-1].plot([-180, 180], [0, 0], c='k', alpha=0.2)
+        axs[-1].set_ylabel('ψ')
+        axs[-1].set_xlabel('φ')
+        axs[-1].set_title(res_name_list[i])
+        i += 1
+
+    def animate(i):
+        step = int(frames*0.01)
+        i = int(i*step)
+        j = int(i+step)
+        for k in range(0, len(phi)):
+            x = phi[k][i:j]
+            y = psi[k][i:j]
+            axs[k].scatter(x,y,color='k', s=15)
+
+    frames = len(phi[0])
+    a = anim.FuncAnimation(fig, animate, frames=frames, interval=1, repeat=True, blit=False)
+
+    #plt.tight_layout()
     plt.show()
 
 def start():
